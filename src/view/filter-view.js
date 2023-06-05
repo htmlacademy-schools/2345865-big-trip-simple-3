@@ -1,4 +1,4 @@
-import {FilterType} from '../mock/const.js';
+import { FilterType } from '../const.js';
 import {capitalizeType} from '../utils/utils.js';
 import AbstractView from '../framework/view/abstract-view.js';
 

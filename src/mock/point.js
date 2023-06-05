@@ -1,7 +1,7 @@
 import {getRandomItemFromItems, getRandomPrice, createIDgenerator} from '../utils/utils.js';
-import {fromToDates, pointTypes } from './const.js';
+import {fromToDates, pointTypes} from './const.js';
 import {destinations} from './destination.js';
-import {getRandomOffersIdsByType} from './offers.js';
+import {getRandomOffersIdsByType} from '../utils/offers.js';
 
 const tripPoints = [];
 
@@ -21,6 +21,7 @@ const generateTripPoints = (n) => {
     };
     tripPoints.push(tripPoint);
   }
+  return tripPoints;
 };
 
 export {tripPoints, generateTripPoints};

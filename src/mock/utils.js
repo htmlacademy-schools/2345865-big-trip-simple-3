@@ -2,8 +2,9 @@ import {generateDestinations} from './destination';
 import {generateTripPoints} from './point';
 
 const mockInit = (numberOfTripPoints, numberOfDestinations) => {
-  generateDestinations(numberOfDestinations);
-  generateTripPoints(numberOfTripPoints);
+  const destinations = generateDestinations(numberOfDestinations);
+  const tripPoints = generateTripPoints(numberOfTripPoints);
+  return [tripPoints, destinations];
 };
 
 export {mockInit};

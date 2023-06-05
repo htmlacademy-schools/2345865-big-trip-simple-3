@@ -1,4 +1,4 @@
-import {SortType} from '../mock/const';
+import {SortTypeForDrawing} from '../const';
 import {capitalizeType} from '../utils/utils';
 import {isDisabled} from '../utils/sorts';
 import AbstractView from '../framework/view/abstract-view';
@@ -15,7 +15,7 @@ export default class SortView extends AbstractView {
 
   #sortTypeChangeHandler = (evt) => {
     evt.preventDefault();
-    this._callback.sortTypeChange(evt.target.value.split('-')[1]);
+    this._callback.sortTypeChange(evt.target.value);
   };
 }
 
@@ -28,7 +28,7 @@ function createSortItemTemplate(sortType) {
 }
 
 function createSortTemplate() {
-  const sortItemsTemplate = Object.values(SortType).map((sortType) => createSortItemTemplate(sortType)).join('');
+  const sortItemsTemplate = Object.values(SortTypeForDrawing).map((sortType) => createSortItemTemplate(sortType)).join('');
   return (`
   <form class="trip-events__trip-sort  trip-sort" action="#" method="get">
     ${sortItemsTemplate}
