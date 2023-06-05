@@ -19,4 +19,16 @@ const SortType = {
   OFFER: 'sort-offer'
 };
 
-export {SortType, FilterType, SortTypeForDrawing};
+const UserAction = {
+  UPDATE_TRIPPOINT: 'UPDATE_TRIPPOINT',
+  ADD_TRIPPOINT: 'ADD_TRIPPOINT',
+  DELETE_TRIPPOINT: 'DELETE_TRIPPOINT',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+export {SortType, FilterType, SortTypeForDrawing, UserAction, UpdateType};
