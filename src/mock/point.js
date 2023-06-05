@@ -1,6 +1,6 @@
-import {getRandomItemFromItems, getRandomPrice, createIDgenerator} from '../utils.js';
-import {fromToDates, pointTypes} from './const.js';
-import {destinations, generateDestinations} from './destination.js';
+import {getRandomItemFromItems, getRandomPrice, createIDgenerator} from '../utils/utils.js';
+import {fromToDates, pointTypes } from './const.js';
+import {destinations} from './destination.js';
 import {getRandomOffersIdsByType} from './offers.js';
 
 const tripPoints = [];
@@ -23,9 +23,4 @@ const generateTripPoints = (n) => {
   }
 };
 
-const mockInit = (numberOfTripPoints, numberOfDestinations) => {
-  generateDestinations(numberOfDestinations);
-  generateTripPoints(numberOfTripPoints);
-};
-
-export {mockInit, tripPoints};
+export {tripPoints, generateTripPoints};
