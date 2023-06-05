@@ -1,45 +1,60 @@
 import {render} from './framework/render.js';
-import {mockInit} from './mock/utils.js';
-import {offersByType} from './mock/const.js';
 import BoardPresenter from './presenter/board-presenter.js';
+import FilterPresenter from './presenter/filter-presenter.js';
 import TripPointModel from './model/trip-point-model.js';
 import DestinationsModel from './model/destinations-model.js';
 import OffersModel from './model/offers-model.js';
 import FilterModel from './model/filter-model.js';
-import FilterPresenter from './presenter/filter-presenter.js';
 import NewTripPointButtonView from './view/new-trip-point-button-view.js';
+import TripPointApi from './api/trip-point-api-service.js';
 
-const [tripPoints, destinations] = mockInit(5, 10);
-const pageContainer = document.querySelector('.trip-events');
-const siteFilterElement = document.querySelector('.trip-controls__filters');
-const siteHeaderElement = document.querySelector('.trip-main');
-const tripPointsModel = new TripPointModel(tripPoints);
-const destinationsModel = new DestinationsModel(destinations);
-const offersModel = new OffersModel(offersByType);
-const filterModel = new FilterModel();
+const AUTH = 'Basic cladium1337228';
+const DOMAIN = 'https://18.ecmascript.pages.academy/big-trip';
+const tripPointAPI = new TripPointApi(DOMAIN, AUTH);
 
-const boardPresenter = new BoardPresenter({boardContainer: pageContainer,
-  tripPointsModel, destinationsModel, offersModel, filterModel, onNewTripPointDestroy: handleNewTripPointFormClose});
+const board = document.querySelector('.trip-events');
+const siteFilter = document.querySelector('.trip-controls__filters');
+const siteHeader = document.querySelector('.trip-main');
 
-const filterPresenter = new FilterPresenter({
-  filterContainer: siteFilterElement,
-  filterModel,
-  tripPointsModel
+const tripPoints = new TripPointModel({
+  tripPointApiService: tripPointAPI
 });
+
+const destinations = new DestinationsModel({tripPointApiService: tripPointAPI});
+const offers = new OffersModel({tripPointApiService: tripPointAPI});
+const filter = new FilterModel();
 
 const newTripPointButtonComponent = new NewTripPointButtonView({
   onClick: handleNewTripPointButtonClick
 });
 
-function handleNewTripPointFormClose() {
-  newTripPointButtonComponent.element.disabled = false;
-}
+const boardPresenter = new BoardPresenter({
+  boardContainer: board,
+  tripPointsModel: tripPoints,
+  destinationsModel: destinations,
+  offersModel: offers,
+  filterModel: filter,
+  onNewTripPointDestroy
+});
+
+const filterPresenter = new FilterPresenter({
+  filterContainer: siteFilter,
+  filterModel: filter,
+  tripPointsModel: tripPoints
+});
 
 function handleNewTripPointButtonClick() {
   boardPresenter.createTripPoint();
   newTripPointButtonComponent.element.disabled = true;
 }
 
-render(newTripPointButtonComponent, siteHeaderElement);
+function onNewTripPointDestroy() {
+  newTripPointButtonComponent.element.disabled = false;
+}
+
 filterPresenter.init();
 boardPresenter.init();
+tripPoints.init()
+  .finally(() => {
+    render(newTripPointButtonComponent, siteHeader);
+  });
