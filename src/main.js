@@ -12,3 +12,4 @@ const boardPresenter = new BoardPresenter({boardContainer: pageContainer, tripPo
 
 render(new FilterView(), siteFilterElement);
 boardPresenter.init();
+//already done
