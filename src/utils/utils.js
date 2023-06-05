@@ -16,6 +16,5 @@ const createIDgenerator = () => {
 const getRandomPicId = () => Math.floor(Math.random() * 5) + 1;
 const isEscapeKey = (evt) => evt.key === 'Escape';
 const capitalizeType = (type) => type.charAt(0).toUpperCase() + type.slice(1);
-const updateItem = (items, update) => items.map((item) => item.id === update.id ? update : item);
 
-export {getRandomItemFromItems, getRandomPrice, capitalizeType, createIDgenerator, getRandomSliceFromItems, getItemFromItemsById, isEscapeKey, getRandomPicId, updateItem};
+export {getRandomItemFromItems, getRandomPrice, capitalizeType, createIDgenerator, getRandomSliceFromItems, getItemFromItemsById, isEscapeKey, getRandomPicId};

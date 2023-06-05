@@ -1,7 +1,7 @@
-import {FilterType} from '../mock/const';
+import { FilterType } from '../const';
 import dayjs from 'dayjs';
 
-const isTripDateBeforeToday = (date) => dayjs(date).isBefore(dayjs(), 'D') || dayjs(date).isSame(dayjs(), 'D');
+const isTripDateBeforeToday = (date) => date && dayjs().isBefore(date, 'D');
 
 const filter = {
   [FilterType.FUTURE]: (tripPoints) => tripPoints.filter((tripPoint) => isTripDateBeforeToday(tripPoint.dateFrom)),
@@ -10,4 +10,4 @@ const filter = {
 
 const generateFilter = () => Object.keys(filter).map((filterName) => filterName );
 
-export {generateFilter};
+export {generateFilter, filter , isTripDateBeforeToday};
