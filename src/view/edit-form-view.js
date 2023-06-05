@@ -1,31 +1,32 @@
-import {createElement} from '../render.js';
 import {destinations} from '../mock/destination.js';
 import {convertToBasicime, getItemFromItemsById, capitalizeType} from '../utils.js';
 import {getOffersByType} from '../mock/const.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
-export default class EditFormView {
-  #element = null;
+export default class EditFormView extends AbstractView {
   #tripPoint = null;
+  #handleFormSubmit = null;
 
-  constructor(tripPoint) {
+  constructor({tripPoint, onFormSubmit}) {
+    super();
     this.#tripPoint = tripPoint;
+
+    this.#handleFormSubmit = onFormSubmit;
+
+    this.element.querySelector('.event--edit')
+      .addEventListener('submit', this.#formSubmitHandler);
+    this.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#formSubmitHandler);
   }
 
   get template() {
     return createEditFormTemplate(this.#tripPoint);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFormSubmit();
+  };
 }
 
 function createOffersTemplate(offers, type) {
@@ -160,3 +161,4 @@ function createEditFormTemplate(tripPoint) {
   </li>`
   );
 }
+
