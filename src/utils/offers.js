@@ -1,5 +1,5 @@
-import {getRandomSliceFromItems} from '../utils/utils';
-import {offersByType} from './const';
+import {getRandomSliceFromItems} from './utils';
+import {offersByType} from '../mock/const';
 
 const getOffersByType = (type) => offersByType.find((offers) => offers.type === type).offers;
 
@@ -8,8 +8,4 @@ const getRandomOffersIdsByType = (type) => {
   return currentTypeRandomOffers.map((offer) => offer.id);
 };
 
-const getOfferById = (id, type) => (getOffersByType(type)
-  .find((offer) => offer.id === id));
-
-
-export {getRandomOffersIdsByType, getOfferById, getOffersByType };
+export {getRandomOffersIdsByType, getOffersByType };

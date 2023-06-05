@@ -1,16 +1,18 @@
-import {SortType} from '../mock/const';
-import {sortPointsByDate, sortPointsByPrice} from '../utils/sorts';
+import {SortType} from '../const';
+import {sorts} from '../utils/sorts';
 import {RenderPosition, render} from '../framework/render.js';
 import SortView from '../view/sort-view';
-import CreateFormView from '../view/create-form-view';
 import NoPointsView from '../view/no-points-view';
-import TripPointPresenter from './tripPoint-presenter';
+import TripPointPresenter from './trip-point-presenter';
 import TripPointListView from '../view/trip-point-list-view';
+import EditFormView from '../view/edit-form-view';
 
 export default class BoardPresenter {
   #boardContainer = null;
   #tripPointsModel = null;
   #tripPoints = null;
+  #destinations = null;
+  #offers = null;
   #tripPointsListComponent = new TripPointListView();
   #noTripPointComponent = new NoPointsView();
   #sortComponent = new SortView();
@@ -25,6 +27,8 @@ export default class BoardPresenter {
 
   init() {
     this.#tripPoints = [...this.#tripPointsModel.tripPoints];
+    this.#destinations = [...this.#tripPointsModel.destinations];
+    this.#offers = [...this.#tripPointsModel.offers];
     this.#renderBoard();
     this.#sourcedTripPoints = [...this.#tripPointsModel.tripPoints];
   }
@@ -43,15 +47,10 @@ export default class BoardPresenter {
   };
 
   #sortTripPoints(sortType) {
-    switch (sortType) {
-      case SortType.PRICE:
-        this.#tripPoints.sort(sortPointsByPrice);
-        break;
-      case SortType.TIME:
-        this.#tripPoints.sort(sortPointsByDate);
-        break;
-      default:
-        this.#tripPoints = [...this.#sourcedTripPoints];
+    if (sorts[sortType]) {
+      this.#tripPoints.sort(sorts[sortType]);
+    } else {
+      this.#tripPoints = [...this.#sourcedTripPoints];
     }
     this.#currentSortType = sortType;
   }
@@ -67,40 +66,36 @@ export default class BoardPresenter {
     // - очищаем список
     // - рисуем ему заново
     this.#clearTripPointList();
-    this.#renderTripPointsList();
+    this.#renderTripPoints();
   };
 
   #renderTripPoint(tripPoint) {
-
     const tripPoinPresenter = new TripPointPresenter({
       tripPointList: this.#tripPointsListComponent.element,
       onModeChange: this.#handleModeChange
     });
 
-    tripPoinPresenter.init(tripPoint);
+    tripPoinPresenter.init(tripPoint, this.#destinations, this.#offers);
     this.#tripPointPresenter.set(tripPoint.id, tripPoinPresenter);
   }
 
 
   #renderTripPoints() {
+    render(this.#tripPointsListComponent, this.#boardContainer);
     this.#tripPoints.forEach((tripPoint) => this.#renderTripPoint(tripPoint));
   }
 
-  #renderTripPointsList() {
-    render(this.#tripPointsListComponent, this.#boardContainer);
-    this.#renderTripPoints();
-  }
 
   #renderBoard() {
 
     if (this.#tripPoints.length === 0) {
-      render(this.#renderNoTripPoints, this.#boardContainer);
+      this.#renderNoTripPoints();
       return;
     }
     this.#renderSort();
 
-    render(new CreateFormView(this.#tripPoints[0]), this.#tripPointsListComponent.element);
-    this.#renderTripPointsList();
+    render(new EditFormView({tripPoint: this.#tripPoints[0], destinations: this.#destinations, offers: this.#offers, isEditForm: false}), this.#tripPointsListComponent.element);
+    this.#renderTripPoints();
 
   }
 

@@ -1,16 +1,18 @@
 
 import {capitalizeType, getItemFromItemsById} from '../utils/utils.js';
 import {convertToEventDateTime, convertToEventDate, convertToDateTime, convertToTime} from '../utils/formatTime-Utils.js';
-import {destinations} from '../mock/destination.js';
-import {getOfferById} from '../mock/offers.js';
 import AbstractView from '../framework/view/abstract-view.js';
 
 export default class TripPointView extends AbstractView {
   #tripPoint = null;
+  #destinations = null;
+  #offers = null;
 
-  constructor({tripPoint, onEditClick}) {
+  constructor({tripPoint, destinations, offers, onEditClick}) {
     super();
     this.#tripPoint = tripPoint;
+    this.#destinations = destinations;
+    this.#offers = offers;
     this._callback.onEditClick = onEditClick;
 
     this.element.querySelector('.event__rollup-btn')
@@ -18,7 +20,7 @@ export default class TripPointView extends AbstractView {
   }
 
   get template() {
-    return createTripPointTemplate(this.#tripPoint);
+    return createTripPointTemplate(this.#tripPoint, this.#destinations, this.#offers);
   }
 
   #editClickHandler = (evt) => {
@@ -27,18 +29,18 @@ export default class TripPointView extends AbstractView {
   };
 }
 
-function createOffersTemplate(offersIDs, type) {
-  return offersIDs.map((offerID) => {
-    const offer = getOfferById(offerID, type);
-    return `<li class="event__offer">
-        <span class="event__offer-title">${offer.title}</span>
-         &plus;&euro;&nbsp;
-        <span class="event__offer-price">${offer.price}</span>
-      </li>`;
-  }).join('');
+function createOffersTemplate(offers, offersIDs, type) {
+  const currentTypeOffers = offers.find((el) => el.type === type).offers;
+  return currentTypeOffers.filter((el) => offersIDs.includes(el.id)).map((offer) => `
+    <li class="event__offer">
+      <span class="event__offer-title">${offer.title}</span>
+      &plus;&euro;&nbsp;
+      <span class="event__offer-price">${offer.price}</span>
+    </li>`
+  ).join('');
 }
 
-function createTripPointTemplate(tripPoint) {
+function createTripPointTemplate(tripPoint, destinations, offers) {
   const destination = getItemFromItemsById(destinations, tripPoint.destination);
   return (
     `<li class="trip-events__item">
@@ -60,7 +62,7 @@ function createTripPointTemplate(tripPoint) {
       </p>
       <h4 class="visually-hidden">Offers:</h4>
       <ul class="event__selected-offers">
-        ${createOffersTemplate(tripPoint.offersIDs, tripPoint.type)}
+        ${createOffersTemplate(offers, tripPoint.offersIDs, tripPoint.type)}
       </ul>
       <button class="event__rollup-btn" type="button">
         <span class="visually-hidden">Open event</span>
