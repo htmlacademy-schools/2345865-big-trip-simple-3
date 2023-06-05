@@ -1,13 +1,14 @@
-import { FilterType } from '../const';
+import {FilterType} from '../const';
 import dayjs from 'dayjs';
 
-const isTripDateBeforeToday = (date) => date && dayjs().isBefore(date, 'D');
+const isFuture = (dateFrom, dateTo) => dateFrom && dateTo && (dayjs().isBefore(dateFrom, 'D') || dayjs().isBefore(dateTo, 'D'));
+const isPast = (dateTo) => dateTo && dayjs().isAfter(dateTo, 'D');
+
 
 const filter = {
-  [FilterType.FUTURE]: (tripPoints) => tripPoints.filter((tripPoint) => isTripDateBeforeToday(tripPoint.dateFrom)),
+  [FilterType.FUTURE]: (tripPoints) => tripPoints.filter((tripPoint) => isFuture(tripPoint.dateFrom, tripPoint.dateTo)),
   [FilterType.EVERYTHING]: (tripPoints) => tripPoints,
+  [FilterType.PAST]: (tripPoints) => tripPoints.filter((tripPoint) => isPast(tripPoint.dateTo)),
 };
 
-const generateFilter = () => Object.keys(filter).map((filterName) => filterName );
-
-export {generateFilter, filter , isTripDateBeforeToday};
+export {filter};

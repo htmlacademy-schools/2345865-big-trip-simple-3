@@ -1,7 +1,7 @@
 import {render, replace, remove} from '../framework/render';
 import {isEscapeKey} from '../utils/utils';
 import {UserAction, UpdateType} from '../const';
-import {isDatesEqual} from '../utils/formatTime-Utils';
+import {isDatesEqual} from '../utils/format-time-utils';
 import TripPointView from '../view/trip-point-view';
 import EditFormView from '../view/edit-form-view';
 
@@ -31,17 +31,14 @@ export default class TripPointPresenter {
     this.#tripPoint = tripPoint;
     this.#destinations = destinations;
     this.#offers = offers;
-
     const prevTripPointComponent = this.#tripPointComponent;
     const prevEditFormComponent = this.#editFormComponent;
-
     this.#tripPointComponent = new TripPointView({
       tripPoint: this.#tripPoint,
       destinations: this.#destinations,
       offers: this.#offers,
       onEditClick: this.#handleEditClick,
     });
-
     this.#editFormComponent = new EditFormView({
       tripPoint: this.#tripPoint,
       destinations: this.#destinations,
@@ -61,7 +58,8 @@ export default class TripPointPresenter {
         replace(this.#tripPointComponent, prevTripPointComponent);
         break;
       case Mode.EDITING:
-        replace(this.#editFormComponent, prevEditFormComponent);
+        replace(this.#tripPointComponent, prevEditFormComponent);
+        this.#mode = Mode.DEFAULT;
     }
 
     remove(prevEditFormComponent);
@@ -80,6 +78,24 @@ export default class TripPointPresenter {
     }
   }
 
+  setSaving() {
+    if (this.#mode === Mode.EDITING) {
+      this.#editFormComponent.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  }
+
+  setDeleting() {
+    if (this.#mode === Mode.EDITING) {
+      this.#editFormComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
+  }
+
   #replacePointToForm = () => {
     replace(this.#editFormComponent, this.#tripPointComponent);
     this.#handleModeChange();
@@ -89,6 +105,7 @@ export default class TripPointPresenter {
   #replaceFormToPoint = () => {
     replace(this.#tripPointComponent, this.#editFormComponent);
     this.#mode = Mode.DEFAULT;
+    document.body.removeEventListener('keydown', this.#ecsKeyDownHandler);
   };
 
   #ecsKeyDownHandler = (evt) => {
@@ -105,6 +122,23 @@ export default class TripPointPresenter {
     document.body.addEventListener('keydown', this.#ecsKeyDownHandler);
   };
 
+  setAborting() {
+    if (this.#mode === Mode.DEFAULT) {
+      this.#tripPointComponent.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#editFormComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#editFormComponent.shake(resetFormState);
+  }
+
   #handleFormSubmit = (update) => {
     const isMinorUpdate = !isDatesEqual(this.#tripPoint.dateFrom, update.dateFrom) || this.#tripPoint.basePrice !== update.basePrice;
     this.#handleDataChange(
@@ -112,14 +146,12 @@ export default class TripPointPresenter {
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       update,
     );
-    this.#replaceFormToPoint();
     document.body.removeEventListener('keydown', this.#ecsKeyDownHandler);
   };
 
   #handleRollupButtonClick = () => {
     this.#editFormComponent.reset(this.#tripPoint);
     this.#replaceFormToPoint();
-    document.body.removeEventListener('keydown', this.#ecsKeyDownHandler);
   };
 
   #handleDeleteClick = (tripPoint) => {

@@ -1,14 +1,12 @@
 import {render, remove, RenderPosition} from '../framework/render';
 import {isEscapeKey} from '../utils/utils';
 import {UserAction, UpdateType} from '../const';
-import {nanoid} from 'nanoid';
 import EditFormView from '../view/edit-form-view';
 
 export default class NewTripPointPresenter {
   #handleDataChange = null;
   #handleDestroy = null;
   #tripPointListContainer = null;
-
   #tripPointEditComponent = null;
 
   constructor({tripPointListContainer, onDataChange, onDestroy}) {
@@ -32,7 +30,6 @@ export default class NewTripPointPresenter {
 
     render(this.#tripPointEditComponent, this.#tripPointListContainer,
       RenderPosition.AFTERBEGIN);
-
     document.body.addEventListener('keydown', this.#ecsKeyDownHandler);
   }
 
@@ -42,13 +39,10 @@ export default class NewTripPointPresenter {
     }
 
     this.#handleDestroy();
-
     remove(this.#tripPointEditComponent);
     this.#tripPointEditComponent = null;
-
     document.body.removeEventListener('keydown', this.#ecsKeyDownHandler);
   }
-
 
   #ecsKeyDownHandler = (evt) => {
     if (isEscapeKey(evt)) {
@@ -57,18 +51,41 @@ export default class NewTripPointPresenter {
     }
   };
 
+  setSaving() {
+    this.#tripPointEditComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this.#tripPointEditComponent.updateElement({
+        isDisabled: false,
+        isSavinf: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#tripPointEditComponent.shake(resetFormState);
+  }
+
   #handleFormSubmit = (tripPoint) => {
     this.#handleDataChange(
       UserAction.ADD_TRIPPOINT,
       UpdateType.MINOR,
 
-      {id: nanoid(), ...tripPoint}
+      this.#deleteId(tripPoint)
     );
 
-    this.destroy();
   };
 
   #handleDeleteClick = () => {
     this.destroy();
+  };
+
+  #deleteId = (tripPoint) => {
+    delete tripPoint.id;
+    return tripPoint;
   };
 }
